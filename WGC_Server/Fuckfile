@@ -1,0 +1,56 @@
+!FuckMake
+
+CC = g++
+LD = g++
+
+CPPFLAGS_COMMON = -m64 -Wall -std=c++20
+
+CPPFLAGS_DBG = %(CPPFLAGS_COMMON) -O0 -g
+CPPLFLAGS = %(CPPFLAGS_COMMON) -O3
+
+LFLAGS_COMMON = -m64
+
+LFLAGS_DBG = %(LFLAGS_COMMON)
+LFLAGS = %(LFLAGS_COMMON)
+
+INC = -Iinclude/
+
+OutDir = build/
+ObjDirDbg = build/debug/
+ObjDir = build/release/
+
+CPPFiles = GetFiles(src/,*.cpp,)
+
+Compile_DBG {
+	Msg(Compiing %Input)
+	!%(CC) %(CPPFLAGS_DBG) %(INC) -c -o %Output %Input
+}
+
+Compile {
+	Msg(Compiing %Input)
+	!%(CC) %(CPPFLAGS_DBG) %(INC) -c -o %Output %Input
+}
+
+Link_DBG {
+	Msg(Linking %Output)
+	!%(LD) %(LFLAGS_DBG) -o %Output %Input
+}
+
+Link {
+	Msg(Linking %Output)
+	!%(LD) %(LFLAGS) -o %Output %Input
+}
+
+debug:
+	Msg(Buidling Debug)
+	ExecuteList(Compile_DBG, %(CPPFiles), %(ObjDirDbg))
+	Execute(Link_DBG, GetFiles(%(ObjDirDbg),*.obj,), %(OutDir)WGC_Server)
+
+release:
+	Msg(Buidling Release)
+	ExecuteList(Compile, %(CPPFiles), %(ObjDir))
+	Execute(Link, GetFiles(%(ObjDir),*.obj,), %(OutDir)WGC_Server)
+
+clean:
+	Msg(Cleaning)
+	DeleteFiles(GetFiles(%(OutDir),*,))
